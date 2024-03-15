@@ -1,0 +1,57 @@
+#define TRIG_PIN 12
+#define ECHO_PIN 11
+#define OUTPUT_PIN 10
+
+#define DISTANCE_THRESHOLD 50 // Umbral de distancia en centímetros
+#define PRESENCE_DURATION 5000  // Duración de presencia en milisegundos
+int flag=0;
+unsigned long startTime = 0;
+boolean presenceDetected = false;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(OUTPUT_PIN, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  long duration = pulseIn(ECHO_PIN, HIGH);
+  int distance = duration * 0.034 / 2;
+ 
+  Serial.println("Distancia:");
+  Serial.println(distance);
+
+
+  if (distance < DISTANCE_THRESHOLD) {
+  
+    flag++;
+    delay(500);
+  }
+
+  if(distance > DISTANCE_THRESHOLD ){
+    flag=0;
+  }
+
+  Serial.println(flag);
+  if (flag==2){
+    Serial.println("Alguien ha estado presente durante al menos 5 segundos a menos de 1 metro.");
+    digitalWrite(OUTPUT_PIN, HIGH);
+    delay(3000); // Duración de la señal
+    digitalWrite(OUTPUT_PIN, LOW);
+    delay(500);
+    
+    flag=0;
+    // Puedes realizar acciones adicionales aquí
+    
+  }
+  delay(1000);  // Espera un segundo antes de la siguiente medición
+
+
+}
